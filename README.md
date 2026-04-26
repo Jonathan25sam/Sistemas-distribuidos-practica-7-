@@ -1,4 +1,4 @@
-Práctica 6: Servicios Web (Arquitectura de Microservicios)
+Práctica 7: Servicios Web (Arquitectura de Microservicios)
 Este repositorio contiene la implementación de un sistema distribuido orientado a servicios web para la gestión operativa de una franquicia comercial. La arquitectura está diseñada para aislar los dominios de datos y garantizar la comunicación síncrona interna mediante Spring Boot y Spring Cloud.
 
 Tecnologías y Requisitos Previos
