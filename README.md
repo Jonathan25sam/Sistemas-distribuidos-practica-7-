@@ -1,30 +1,31 @@
-Práctica 7: Servicios Web (Arquitectura de Microservicios)
-Este repositorio contiene la implementación de un sistema distribuido orientado a servicios web para la gestión operativa de una franquicia comercial. La arquitectura está diseñada para aislar los dominios de datos y garantizar la comunicación síncrona interna mediante Spring Boot y Spring Cloud.
+# Sistema de Inventario Distribuido - Backend
 
-Tecnologías y Requisitos Previos
-Java Development Kit (JDK) 17
-Apache Maven (versiones LTS para compatibilidad de dependencias)
-Entorno de desarrollo (Apache NetBeans recomendado)
-Topología de la Red
-El ecosistema consta de cuatro componentes independientes. Para evitar colisiones y asegurar el aislamiento, operan en los siguientes puertos TCP:
+Este repositorio contiene la arquitectura de microservicios desarrollada para la gestión de inventario de una carnicería. El sistema utiliza una arquitectura basada en Spring Cloud para garantizar la comunicación y el descubrimiento de servicios.
 
-Eureka Server (Registro y descubrimiento): localhost:8761
-MS-Inventario (Lógica de almacén y persistencia H2): localhost:8082
-MS-Ventas (Orquestación y consumo interno vía OpenFeign): localhost:8083
-API Gateway (Punto de entrada unificado y enrutamiento): localhost:8080
-Instrucciones de Ejecución
-Para garantizar que el enrutamiento dinámico funcione correctamente, los proyectos deben inicializarse en el siguiente orden estricto:
+## Estructura del Proyecto
 
-eureka-server: Compilar y ejecutar primero. Validar que el panel de control esté activo accediendo a http://localhost:8761 desde un navegador web.
-ms-inventario: Ejecutar el proyecto. La base de datos volátil H2 se inicializará automáticamente en memoria con el catálogo base.
-ms-ventas: Ejecutar el proyecto.
-api-gateway: Ejecutar al final.
-Nota de despliegue: Una vez inicializados todos los módulos, se recomienda esperar aproximadamente 30 segundos. Este tiempo es necesario para que Eureka registre completamente las instancias y propague los metadatos de red (heartbeats) hacia el Gateway y el servicio de Ventas.
+El ecosistema está compuesto por 4 servicios principales:
+1. **Eureka Server**: Servidor de descubrimiento para el registro de los microservicios.
+2. **API Gateway**: Punto de entrada único que gestiona el enrutamiento y la configuración de CORS para el frontend.
+3. **MS-Inventario**: Microservicio encargado del manejo de la base de datos H2 y el stock de cortes.
+4. **MS-Ventas**: Microservicio que actúa como intermediario para consultar la disponibilidad.
 
-Pruebas de Integración (Endpoints)
-De acuerdo con el diseño arquitectónico, los clientes externos no tienen acceso directo a los puertos 8082 y 8083. Toda petición debe canalizarse a través del Gateway.
+## Requisitos previos
+* Java JDK 17 o superior.
+* Maven 3.6+.
+* NetBeans o IntelliJ IDEA.
 
-Para probar la traza completa de comunicación inter-servicio (B2B), ejecutar una petición GET a la siguiente ruta:
+## Configuración y Puertos
+* Eureka Server: 8761
+* API Gateway: 8080
+* MS-Ventas: 8081
+* MS-Inventario: 8082
 
-URL: http://localhost:8080/api/ventas/ver-disponibilidad
-Flujo esperado: El Gateway intercepta la petición, localiza el servicio de ventas y redirige el tráfico. Ventas utiliza su cliente OpenFeign para solicitar asíncronamente el catálogo al servicio de inventario. El JSON resultante viaja de regreso por todas las capas hasta el cliente.
+## Orden de ejecución
+Para que el sistema funcione correctamente, los servicios deben levantarse en este orden:
+1. Ejecutar `eureka-server`.
+2. Ejecutar `ms-inventario` (esperar a que se registre en Eureka).
+3. Ejecutar `ms-ventas`.
+4. Ejecutar `api-gateway`.
+
+La base de datos se inicializa automáticamente en memoria (H2) con los datos precargados en el archivo `data.sql` del microservicio de inventario.
